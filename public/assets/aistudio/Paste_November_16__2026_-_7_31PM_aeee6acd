@@ -1,0 +1,1925 @@
+# URBANOFIGHT CL 2.0 — MASTER ENGINEERING SPECIFICATION
+## REINGENIERÍA CONTROLADA, REFACTORIZACIÓN, OPTIMIZACIÓN Y EXPANSIÓN DE UN VIDEOJUEGO ARCADE DE LUCHA 2D
+
+**DOCUMENTO MAESTRO DE IMPLEMENTACIÓN PARA GOOGLE AI STUDIO**
+
+**Proyecto:** URBANOFIGHT CL  
+**Versión objetivo:** URBANOFIGHT CL 2.0  
+**Tipo de intervención:** Auditoría técnica + corrección de defectos + refactorización incremental + modernización de gameplay + optimización + expansión funcional.  
+**Motor existente:** React 19 + TypeScript + HTML5 Canvas 2D + Vite 8.  
+**Resolución lógica de referencia:** 1280 × 720.  
+**Frecuencia objetivo de simulación:** 60 ticks por segundo.  
+**Arquitectura:** Component-based frontend + game simulation layer + rendering layer + resource management layer.  
+**Principio de intervención:** Preserve Existing Architecture, Incremental Refactoring, Backward Compatibility, Test-Driven Validation.
+
+---
+
+# 0. DIRECTIVA EJECUTIVA NO NEGOCIABLE
+
+Actúa como un equipo de ingeniería profesional especializado en videojuegos de lucha 2D, con autoridad técnica para inspeccionar, diagnosticar, corregir, refactorizar y ampliar el proyecto existente URBANOFIGHT CL.
+
+Tu misión es transformar el proyecto actual en una versión 2.0 técnicamente superior, manteniendo su identidad visual, sus personajes, escenarios, recursos originales y funcionalidades que ya operan correctamente.
+
+No debes entregar solamente documentación, recomendaciones o pseudocódigo.
+
+DEBES IMPLEMENTAR LOS CAMBIOS DIRECTAMENTE SOBRE LOS ARCHIVOS DEL PROYECTO CUANDO TENGAS ACCESO A ELLOS.
+
+Todas las modificaciones deben respetar las siguientes condiciones:
+
+1. No reconstruir el videojuego desde cero.
+2. No reemplazar la arquitectura completa por otra tecnología.
+3. No eliminar sistemas funcionales sin justificación técnica demostrable.
+4. No sustituir spritesheets originales por imágenes genéricas.
+5. No alterar arbitrariamente estadísticas, personajes o escenarios.
+6. No introducir dependencias sin justificar su necesidad.
+7. No duplicar motores, controladores o sistemas de combate.
+8. No implementar funciones inexistentes en las bibliotecas utilizadas.
+9. No utilizar código incompleto como si fuera una implementación terminada.
+10. No declarar funcionalidades verificadas sin ejecutar las pruebas correspondientes.
+11. No ocultar errores de compilación.
+12. No deshabilitar reglas de TypeScript o ESLint para hacer desaparecer advertencias.
+13. No sacrificar precisión de combate por efectos visuales.
+14. No introducir cambios destructivos en archivos que no necesitan modificación.
+
+Cada intervención debe ser incremental, reversible, documentada y verificable.
+
+Cuando exista una ambigüedad técnica, inspecciona las implementaciones actuales, determina el contrato real de los componentes y elige la solución menos invasiva que satisfaga los requisitos.
+
+---
+
+# 1. PERFIL TÉCNICO DEL PROYECTO
+
+Utiliza como referencia la arquitectura existente, verificando previamente cada archivo.
+
+## 1.1 Stack tecnológico
+
+- React 19.
+- TypeScript.
+- Vite 8.
+- HTML5 Canvas 2D.
+- Tailwind CSS 4.
+- Motion.
+- Web Audio API.
+- Gamepad API.
+- requestAnimationFrame.
+- Node.js.
+- npm.
+- TSX para ejecución de pruebas TypeScript.
+
+No migres a Unity, Godot, Phaser, PixiJS u otro motor.
+
+No introduzcas una segunda tecnología de renderizado.
+
+El motor actual debe evolucionar sobre su arquitectura existente.
+
+## 1.2 Módulos principales
+
+Inspecciona particularmente:
+
+- `src/game/rules.ts`
+- `src/game/fighters.ts`
+- `src/game/spriteSheet.ts`
+- `src/game/pixelSprites.ts`
+- `src/game/gamepad.ts`
+- `src/game/audio.ts`
+- `src/game/stages.ts`
+- `src/components/FightArena.tsx`
+- `src/components/GameHud.tsx`
+- `src/App.tsx`
+- `src/game/rules.test.ts`
+- `package.json`
+- `tsconfig.json`
+
+Comprueba las dependencias y los contratos de cada módulo antes de modificarlo.
+
+## 1.3 Arquitectura objetivo
+
+Establece una separación clara entre:
+
+A. DOMAIN LAYER
+- FighterState.
+- MatchState.
+- FighterProfile.
+- AttackDefinition.
+- Hitbox.
+- Hurtbox.
+- Projectile.
+- InputSnapshot.
+- CombatEvent.
+
+B. GAME LOGIC LAYER
+- State machines.
+- Combat resolution.
+- Frame data.
+- Collision detection.
+- Damage calculation.
+- Combo management.
+- AI decision-making.
+- Round management.
+
+C. INPUT LAYER
+- Keyboard input.
+- Gamepad input.
+- Input buffering.
+- Command recognition.
+- Player-device mapping.
+
+D. RENDERING LAYER
+- Canvas renderer.
+- Sprite animation.
+- Background rendering.
+- Particles.
+- Screen shake.
+- HUD.
+
+E. AUDIO LAYER
+- Music manager.
+- SFX manager.
+- Audio mixing.
+- Audio event dispatch.
+
+F. PRESENTATION LAYER
+- Menus.
+- Character select.
+- Stage select.
+- Pause.
+- Training mode.
+- Settings.
+
+G. TESTING LAYER
+- Unit tests.
+- Integration tests.
+- Regression tests.
+- Performance diagnostics.
+
+Evita dependencias circulares entre módulos.
+
+La lógica de combate no debe depender directamente de React ni de componentes visuales.
+
+---
+
+# 2. AUDITORÍA TÉCNICA OBLIGATORIA ANTES DE MODIFICAR
+
+Realiza una inspección completa del proyecto.
+
+Genera un inventario de:
+
+- Archivos fuente.
+- Archivos de configuración.
+- Dependencias.
+- Recursos gráficos.
+- Spritesheets.
+- Retratos.
+- Escenarios.
+- Archivos de audio.
+- Sistemas de combate.
+- Sistemas de control.
+- Interfaces.
+- Pruebas existentes.
+
+Construye un mapa de dependencias.
+
+Identifica:
+
+- Dead code.
+- Unused imports.
+- Unused variables.
+- Type mismatches.
+- Implicit any.
+- Duplicated logic.
+- Race conditions.
+- State mutation.
+- Memory leaks.
+- Uncontrolled timers.
+- Event listener leaks.
+- Excessive allocations.
+- Incorrect cleanup.
+- Missing error handling.
+- Invalid state transitions.
+- Inconsistent time calculations.
+
+Clasifica cada problema:
+
+CONFIRMED: reproducido o demostrado por código.
+
+PROBABLE: existe evidencia técnica, pero falta reproducción.
+
+HYPOTHESIS: requiere investigación adicional.
+
+ENHANCEMENT: oportunidad de mejora sin defecto demostrado.
+
+No conviertas hipótesis en defectos confirmados.
+
+---
+
+# 3. CORRECCIÓN H-01 — KEYBOARD INPUT COLLISION
+
+**Severidad:** ALTA.
+
+**Archivo principal:** `src/components/FightArena.tsx`.
+
+## Problema
+
+La tecla `KeyR` está asignada al ataque Heavy Punch de P1 en el modo versus local.
+
+También está asignada al reinicio de partida.
+
+Esto produce un conflicto de entrada.
+
+## Especificación de solución
+
+Implementa un sistema centralizado de input mapping.
+
+El sistema debe separar:
+
+- Combat inputs.
+- Navigation inputs.
+- System inputs.
+- Debug inputs.
+
+Define una configuración de controles por jugador.
+
+Ejemplo de contrato:
+
+```ts
+export interface PlayerKeyBindings {
+  left: string;
+  right: string;
+  up: string;
+  down: string;
+  lightPunch: string;
+  heavyPunch: string;
+  lightKick: string;
+  heavyKick: string;
+  ultra: string;
+  dash: string;
+  block: string;
+}
+
+export interface SystemKeyBindings {
+  pause: string;
+  mute: string;
+  restart: string;
+}
+```
+
+Implementa un mapa de controles inicial:
+
+P1:
+- A: izquierda.
+- D: derecha.
+- W: salto.
+- S: agacharse.
+- F: puño débil.
+- R: puño fuerte.
+- G: patada débil.
+- H: patada fuerte.
+- T: Ultra.
+- Shift izquierdo: Dash.
+- C: bloqueo.
+
+P2:
+- Flechas: movimiento.
+- J: puño débil.
+- U: puño fuerte.
+- K: patada débil.
+- L: patada fuerte.
+- O: Ultra.
+- I: Dash.
+- P: bloqueo.
+
+Sistema:
+- Escape: pausa.
+- M: mute.
+- Reinicio: únicamente desde menú de pausa o una combinación dedicada que no se superponga con el combate.
+
+IMPORTANTE: verifica las asignaciones actuales y conserva las que ya estén documentadas, excepto los conflictos.
+
+## Contrato funcional
+
+Un evento de ataque no puede ejecutar una acción administrativa.
+
+Una acción administrativa no puede activar un ataque.
+
+Utiliza `event.code` para las teclas físicas.
+
+Implementa:
+
+- Keydown edge detection.
+- Keyup state release.
+- Held input tracking.
+- Just-pressed tracking.
+- Focus-loss reset.
+- Visibility-change reset.
+- Prevent default solo cuando corresponda.
+- Control configurable.
+
+Crea una función pura:
+
+```ts
+export function hasBindingConflict(
+  playerBindings: PlayerKeyBindings,
+  systemBindings: SystemKeyBindings
+): string[] {
+  const playerKeys = Object.values(playerBindings);
+  const systemKeys = Object.values(systemBindings);
+
+  return playerKeys.filter((key) => systemKeys.includes(key));
+}
+```
+
+Adapta las interfaces para permitir futuras configuraciones de P1 y P2.
+
+## Aceptación
+
+- Heavy Punch no reinicia el combate.
+- Los ataques funcionan durante toda la partida.
+- Pause y Restart no interfieren con los ataques.
+- No existen entradas duplicadas.
+- Las entradas se liberan correctamente al perder el foco.
+
+---
+
+# 4. CORRECCIÓN H-02 — DAMAGE CALCULATION PIPELINE
+
+**Severidad:** ALTA.
+
+**Archivo:** `src/game/rules.ts`.
+
+## Problema
+
+Los proyectiles se crean con:
+
+```ts
+damage: Math.round(92 * f.profile.powerMult)
+```
+
+Después `applyHit()` vuelve a multiplicar el daño por `attacker.profile.powerMult`.
+
+Esto provoca un escalado duplicado.
+
+## Arquitectura requerida
+
+Implementa una única fuente de verdad para el cálculo del daño.
+
+Pipeline:
+
+BASE DAMAGE
+→ ATTACK MODIFIERS
+→ CHARACTER POWER MULTIPLIER
+→ COMBO SCALING
+→ COUNTER MODIFIER
+→ DEFENSE MODIFIER
+→ FINAL DAMAGE
+→ HP UPDATE.
+
+No apliques el multiplicador del personaje dos veces.
+
+## Código de referencia
+
+```ts
+export interface DamageContext {
+  baseDamage: number;
+  powerMultiplier: number;
+  comboMultiplier: number;
+  counterMultiplier: number;
+  defenseMultiplier: number;
+}
+
+export function calculateFinalDamage(
+  context: DamageContext
+): number {
+  const values = [
+    context.baseDamage,
+    context.powerMultiplier,
+    context.comboMultiplier,
+    context.counterMultiplier,
+    context.defenseMultiplier,
+  ];
+
+  if (values.some((value) => !Number.isFinite(value) || value < 0)) {
+    throw new Error("Invalid damage calculation input");
+  }
+
+  return Math.max(
+    0,
+    Math.round(
+      context.baseDamage *
+      context.powerMultiplier *
+      context.comboMultiplier *
+      context.counterMultiplier *
+      context.defenseMultiplier
+    )
+  );
+}
+```
+
+La función es una especificación inicial. Integra los modificadores reales existentes sin alterar sus valores de balance innecesariamente.
+
+## Corrección del proyectil
+
+El proyectil debe almacenar daño base:
+
+```ts
+interface Projectile {
+  id: number;
+  ownerSlot: number;
+  x: number;
+  y: number;
+  vx: number;
+  radius: number;
+  baseDamage: number;
+  color: string;
+  accent: string;
+  life: number;
+  isBossContract: boolean;
+}
+```
+
+En la creación:
+
+```ts
+baseDamage: 92
+```
+
+En el impacto:
+
+```ts
+const finalDamage = calculateFinalDamage({
+  baseDamage: projectile.baseDamage,
+  powerMultiplier: attacker.profile.powerMult,
+  comboMultiplier: 1,
+  counterMultiplier: wasCounterHit ? 1.15 : 1,
+  defenseMultiplier: 1,
+});
+```
+
+No mantengas simultáneamente `damage` y `baseDamage` con significados ambiguos.
+
+Adapta los tipos y todas las referencias al proyectil.
+
+Si el motor tiene otras fuentes de daño, unifícalas mediante el mismo pipeline.
+
+## Aceptación
+
+- Un multiplicador de personaje se aplica exactamente una vez.
+- El daño de proyectiles es determinista.
+- Los contraataques siguen funcionando.
+- El daño de los ataques normales no cambia involuntariamente.
+- Se incorporan pruebas unitarias.
+
+---
+
+# 5. CORRECCIÓN H-03 — COMBAT CONTACT RESOLUTION
+
+**Severidad:** MEDIA.
+
+**Archivo:** `src/game/rules.ts`.
+
+## Problema
+
+`hasHitThisAttack` se establece antes de conocer el resultado de `applyHit()`.
+
+Un ataque bloqueado puede activar el sistema de cancelación como si hubiera conectado limpiamente.
+
+Además, el motor necesita impedir que el mismo contacto se procese repetidamente durante los frames activos.
+
+## Solución arquitectónica
+
+Separa el contacto procesado del impacto limpio.
+
+Implementa:
+
+```ts
+export type HitResolution =
+  | "hit"
+  | "block"
+  | "miss"
+  | "counter_hit"
+  | "armor_hit"
+  | "invulnerable";
+```
+
+Agrega a FighterState:
+
+```ts
+hasHitThisAttack: boolean;
+hasResolvedContactThisAttack: boolean;
+```
+
+Semántica obligatoria:
+
+`hasHitThisAttack`:
+Indica que se produjo un impacto limpio que habilita cancelaciones on-hit.
+
+`hasResolvedContactThisAttack`:
+Indica que el ataque ya procesó un contacto y no debe repetirlo durante los mismos frames activos, salvo que el movimiento sea explícitamente multihit.
+
+## Refactor de applyHit
+
+Cambia el contrato de retorno:
+
+```ts
+export function applyHit(
+  // conservar los argumentos reales existentes
+): HitResolution {
+  // devolver el resultado correspondiente
+}
+```
+
+No elimines los cálculos actuales de daño, chip damage, meter gain, knockback, hitstop ni eventos.
+
+Modifica únicamente el contrato de resultado y las rutas de salida.
+
+Ejemplo conceptual de integración:
+
+```ts
+const result = applyHit(
+  match,
+  attacker,
+  defender,
+  defenderInput,
+  damage,
+  hitstun,
+  knockbackX,
+  knockbackY,
+  hitstop,
+  meterGain,
+  attacker.action
+);
+
+attacker.hasResolvedContactThisAttack = true;
+
+attacker.hasHitThisAttack =
+  result === "hit" ||
+  result === "counter_hit";
+```
+
+Si existe un resultado `armor_hit`, define expresamente si habilita cancelaciones. No lo trates como impacto limpio automáticamente.
+
+En el collision resolver:
+
+```ts
+if (
+  hitbox &&
+  !attacker.hasResolvedContactThisAttack &&
+  rectsOverlap(hitbox, hurtbox)
+) {
+  // resolver contacto una sola vez
+}
+```
+
+Para movimientos multihit:
+
+- Reiniciar `hasResolvedContactThisAttack` en cada ventana de impacto.
+- Reiniciar `hasHitThisAttack` únicamente según la política de cancelación definida.
+- Mantener contador independiente de impactos.
+- Impedir que una misma ventana genere múltiples colisiones por frame.
+
+## Cancel windows
+
+Implementa reglas separadas:
+
+```ts
+export interface CancelPolicy {
+  onHit: boolean;
+  onBlock: boolean;
+  onCounterHit: boolean;
+  onWhiff: boolean;
+  allowedTargets: string[];
+}
+```
+
+El sistema de cancelación debe consultar el resultado del contacto y la política del ataque.
+
+No permitir cancelaciones universales.
+
+## Aceptación
+
+- Un golpe limpio activa cancelaciones permitidas.
+- Un bloqueo no activa cancelaciones on-hit.
+- Un bloqueo puede permitir block cancel si está expresamente configurado.
+- Un ataque fallido no habilita cancelaciones.
+- Los movimientos multihit funcionan correctamente.
+- No existen impactos duplicados involuntarios.
+
+---
+
+# 6. CORRECCIÓN H-04 — GAMEPAD DEVICE OWNERSHIP
+
+**Severidad:** MEDIA.
+
+**Archivos:**
+- `src/game/gamepad.ts`
+- `src/components/FightArena.tsx`
+
+## Problema
+
+Las llamadas a `triggerXboxRumble(0, ...)` pueden enviar todos los eventos al primer mando.
+
+La selección de mandos mediante una lista ordenada tampoco garantiza una identidad estable cuando los dispositivos se conectan y desconectan.
+
+## Solución
+
+Implementa una asociación estable entre jugador y dispositivo.
+
+Utiliza `Gamepad.index` como identificador de dispositivo durante su conexión.
+
+No dependas exclusivamente de la posición de un mando dentro de un array ordenado.
+
+Contrato:
+
+```ts
+export interface PlayerDeviceAssignment {
+  playerSlot: 1 | 2;
+  gamepadIndex: number | null;
+  gamepadId: string | null;
+  connected: boolean;
+}
+```
+
+Implementa una función:
+
+```ts
+export function findGamepadByIndex(
+  gamepadIndex: number
+): Gamepad | null {
+  if (
+    typeof navigator === "undefined" ||
+    typeof navigator.getGamepads !== "function"
+  ) {
+    return null;
+  }
+
+  const pads = navigator.getGamepads();
+
+  for (const pad of pads) {
+    if (
+      pad &&
+      pad.connected &&
+      pad.index === gamepadIndex
+    ) {
+      return pad;
+    }
+  }
+
+  return null;
+}
+```
+
+Implementa una función de vibración por identidad:
+
+```ts
+export function triggerGamepadRumble(
+  gamepadIndex: number,
+  durationMs: number,
+  strongMagnitude: number,
+  weakMagnitude: number
+): void {
+  const pad = findGamepadByIndex(gamepadIndex);
+
+  if (!pad) return;
+
+  const actuator = (
+    pad as Gamepad & {
+      vibrationActuator?: {
+        playEffect?: (
+          type: string,
+          params: {
+            startDelay: number;
+            duration: number;
+            weakMagnitude: number;
+            strongMagnitude: number;
+          }
+        ) => Promise<string>;
+      };
+    }
+  ).vibrationActuator;
+
+  if (!actuator?.playEffect) return;
+
+  void actuator.playEffect("dual-rumble", {
+    startDelay: 0,
+    duration: Math.max(0, durationMs),
+    strongMagnitude: Math.max(0, Math.min(1, strongMagnitude)),
+    weakMagnitude: Math.max(0, Math.min(1, weakMagnitude)),
+  }).catch(() => undefined);
+}
+```
+
+Adapta la asignación real de mandos para que los eventos de P1 y P2 lleguen al dispositivo correspondiente.
+
+Los eventos de combate deben identificar su propietario:
+
+```ts
+export interface CombatEvent {
+  type: string;
+  slot?: 1 | 2;
+  x?: number;
+  y?: number;
+}
+```
+
+Conserva el sistema actual de eventos y amplía sus tipos de manera segura.
+
+## Aceptación
+
+- P1 vibra únicamente en su mando.
+- P2 vibra únicamente en su mando.
+- Los mandos desconectados no producen errores.
+- La ausencia de vibración no bloquea el combate.
+- No se produce vibración repetitiva fuera de control.
+
+---
+
+# 7. CORRECCIÓN H-05 — AUTOMATED TESTING PIPELINE
+
+**Archivo:** `package.json`.
+
+El proyecto ya contiene:
+
+`src/game/rules.test.ts`
+
+También dispone de TSX como dependencia de desarrollo.
+
+Inspecciona las pruebas existentes antes de modificar la infraestructura.
+
+Incorpora el script:
+
+```json
+{
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist server.js",
+    "lint": "tsc --noEmit",
+    "test": "tsx --test src/game/rules.test.ts"
+  }
+}
+```
+
+Este es un ejemplo de integración que debe conservar los scripts y versiones reales del archivo original.
+
+Si las pruebas requieren múltiples archivos, configura el patrón apropiado.
+
+Implementa pruebas para:
+
+- Damage calculation.
+- Projectile damage.
+- Character multipliers.
+- Counter hit.
+- Block.
+- Cancel windows.
+- Contact resolution.
+- Multihit.
+- Keyboard mappings.
+- Gamepad assignment.
+- Round transitions.
+- KO.
+- Super meter.
+
+Comandos mínimos de validación:
+
+```bash
+npm run lint
+npm test
+npm run build
+```
+
+Todos deben ejecutarse realmente.
+
+No declares éxito por el simple hecho de que los scripts existan.
+
+---
+
+# 8. MODERNIZACIÓN DEL SISTEMA DE FRAME DATA
+
+Implementa un modelo de ataque declarativo.
+
+Cada movimiento debe definirse mediante datos, no mediante condiciones dispersas por el motor.
+
+Contrato objetivo:
+
+```ts
+export interface AttackDefinition {
+  id: string;
+  startupFrames: number;
+  activeFrames: number;
+  recoveryFrames: number;
+  damage: number;
+  hitstunFrames: number;
+  blockstunFrames: number;
+  hitstopFrames: number;
+  knockbackX: number;
+  knockbackY: number;
+  meterGain: number;
+  cancelPolicy: CancelPolicy;
+  isMultiHit: boolean;
+  invulnerabilityFrames: number;
+}
+```
+
+Implementa validación:
+
+```ts
+export function validateAttack(
+  attack: AttackDefinition
+): string[] {
+  const errors: string[] = [];
+
+  if (attack.startupFrames < 0) errors.push("Invalid startup");
+  if (attack.activeFrames <= 0) errors.push("Invalid active frames");
+  if (attack.recoveryFrames < 0) errors.push("Invalid recovery");
+  if (attack.damage < 0) errors.push("Invalid damage");
+  if (attack.hitstunFrames < 0) errors.push("Invalid hitstun");
+  if (attack.blockstunFrames < 0) errors.push("Invalid blockstun");
+  if (attack.hitstopFrames < 0) errors.push("Invalid hitstop");
+
+  return errors;
+}
+```
+
+Define explícitamente:
+
+- Startup.
+- Active.
+- Recovery.
+- Total duration.
+- Cancel window.
+- On-hit advantage.
+- On-block advantage.
+- Whiff recovery.
+
+La duración de cada fase debe expresarse en frames enteros.
+
+Utiliza:
+
+```ts
+const SIMULATION_HZ = 60;
+const FIXED_DT = 1 / SIMULATION_HZ;
+```
+
+Conversión:
+
+```ts
+export function framesToSeconds(frames: number): number {
+  return frames / SIMULATION_HZ;
+}
+```
+
+No mezcles indiscriminadamente segundos y frames.
+
+Centraliza las conversiones.
+
+Conserva las duraciones existentes como punto de partida. No modifiques el balance hasta que las pruebas demuestren que es necesario.
+
+---
+
+# 9. HITBOX / HURTBOX COLLISION SYSTEM
+
+Moderniza la detección de impactos.
+
+Define geometría independiente del renderizado.
+
+```ts
+export interface CollisionBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface AttackCollisionData {
+  hitboxes: CollisionBox[];
+  hurtboxes: CollisionBox[];
+}
+```
+
+Implementa detección AABB:
+
+```ts
+export function intersectsAABB(
+  a: CollisionBox,
+  b: CollisionBox
+): boolean {
+  return (
+    a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y
+  );
+}
+```
+
+Asegura:
+
+- Coordenadas locales por personaje.
+- Transformación según facing.
+- Escalado por personaje.
+- Sincronización con animation frame.
+- Separación entre hitboxes y hurtboxes.
+- Prevención de impactos múltiples.
+- Soporte de ataques aéreos.
+- Soporte de proyectiles.
+
+No permitas que la detección dependa exclusivamente de los límites visuales del sprite.
+
+Incorpora un modo DEBUG_COLLISION.
+
+Representación:
+
+- Rojo: hitbox activa.
+- Verde: hurtbox.
+- Amarillo: zona de contacto.
+- Azul: proyectil.
+- Blanco: origen de coordenadas.
+
+El modo de depuración debe poder desactivarse sin modificar la lógica del combate.
+
+---
+
+# 10. MOTOR DE COMBOS Y CANCELACIONES
+
+Construye un sistema configurable.
+
+Características:
+
+- Normal chains.
+- Special cancels.
+- Super cancels.
+- Hit confirms.
+- Blockstrings.
+- Counter hit routes.
+- Air combos.
+- Juggle states.
+- Combo scaling.
+- Hitstun deterioration.
+- Gravity scaling.
+- Damage scaling.
+- Combo reset conditions.
+
+Contrato:
+
+```ts
+export interface ComboState {
+  hitCount: number;
+  totalDamage: number;
+  scaling: number;
+  lastHitTime: number;
+  active: boolean;
+}
+```
+
+El escalado debe estar limitado:
+
+```ts
+export function getComboScaling(
+  hitCount: number,
+  minimumScaling = 0.25
+): number {
+  const scaling = 1 - Math.max(0, hitCount - 1) * 0.08;
+
+  return Math.max(
+    minimumScaling,
+    Math.min(1, scaling)
+  );
+}
+```
+
+El valor anterior es un punto de partida configurable, NO un balance definitivo.
+
+Implementa reglas para evitar infinitos.
+
+Detecta secuencias que permiten repetir indefinidamente la misma cadena de ataques.
+
+No bloquees combos legítimos por una restricción global arbitraria.
+
+---
+
+# 11. FIXED TIMESTEP SIMULATION
+
+Moderniza el loop de actualización.
+
+El objetivo es desacoplar:
+
+- Simulation tick.
+- Rendering frame.
+- Input polling.
+- Audio event dispatch.
+
+Utiliza un accumulator.
+
+Código de referencia:
+
+```ts
+const FIXED_DT = 1 / 60;
+const MAX_FRAME_DT = 0.05;
+const MAX_STEPS_PER_FRAME = 5;
+
+let accumulator = 0;
+let previousTime = performance.now();
+
+function gameLoop(now: number): void {
+  const elapsed = Math.min(
+    (now - previousTime) / 1000,
+    MAX_FRAME_DT
+  );
+
+  previousTime = now;
+  accumulator += elapsed;
+
+  let steps = 0;
+
+  while (
+    accumulator >= FIXED_DT &&
+    steps < MAX_STEPS_PER_FRAME
+  ) {
+    updateGame(FIXED_DT);
+    accumulator -= FIXED_DT;
+    steps++;
+  }
+
+  if (steps === MAX_STEPS_PER_FRAME) {
+    accumulator = Math.min(accumulator, FIXED_DT);
+  }
+
+  const alpha = accumulator / FIXED_DT;
+
+  renderGame(alpha);
+
+  requestAnimationFrame(gameLoop);
+}
+```
+
+Este fragmento representa el modelo de referencia. Integra la interpolación visual solo si la arquitectura existente permite hacerlo correctamente.
+
+No ejecutes dos loops simultáneos.
+
+No introduzcas una segunda llamada a requestAnimationFrame dentro de los sistemas ya existentes.
+
+Mantén:
+
+- Pause.
+- Resume.
+- KO.
+- Round transition.
+- Finish Him.
+- Match End.
+
+No permitas que el juego avance durante pausa.
+
+---
+
+# 12. FIGHTER STATE MACHINE
+
+Implementa una máquina de estados explícita.
+
+Estados mínimos:
+
+- IDLE.
+- WALK.
+- DASH.
+- JUMP.
+- CROUCH.
+- BLOCK.
+- LIGHT_PUNCH.
+- HEAVY_PUNCH.
+- LIGHT_KICK.
+- HEAVY_KICK.
+- SPECIAL.
+- SUPER.
+- HITSTUN.
+- BLOCKSTUN.
+- DIZZY.
+- KNOCKDOWN.
+- WAKEUP.
+- KO.
+- VICTORY.
+
+Cada estado debe tener:
+
+- Entry conditions.
+- Update behavior.
+- Exit conditions.
+- Interruptibility.
+- Priority.
+- Animation mapping.
+- Collision policy.
+
+Define transiciones válidas.
+
+Evita transiciones imposibles como ejecutar un ataque normal durante KO.
+
+Los estados visuales no deben determinar por sí solos las reglas de combate.
+
+---
+
+# 13. BALANCE DE PERSONAJES
+
+Preserva los ocho perfiles:
+
+- Marcianeke.
+- Pablo Chill-E.
+- Juliano Sosa.
+- Jere Klein.
+- Bayron Fire.
+- Loyalty.
+- Cris MJ.
+- Disquera Internacional.
+
+Mantén sus estadísticas originales como baseline.
+
+No modifiques directamente:
+
+- maxHp.
+- speed.
+- jumpVel.
+- powerMult.
+- scale.
+- aiPolicy.
+
+Primero crea un sistema de evaluación.
+
+Mide:
+
+- Win rate.
+- Damage per combo.
+- Average combo length.
+- Time to KO.
+- Average round duration.
+- Projectile efficiency.
+- Defensive efficiency.
+- Recovery vulnerability.
+- Mobility advantage.
+
+Crea simulaciones automatizadas de enfrentamientos cuando sea posible.
+
+Evalúa los emparejamientos entre personajes.
+
+No busques un 50 % de victorias a cualquier precio si eso destruye sus arquetipos.
+
+Objetivo: diversidad competitiva con ventajas y desventajas compensatorias.
+
+---
+
+# 14. ADVANCED AI SYSTEM
+
+Mantén los perfiles de IA existentes:
+
+- rushdown.
+- tactical.
+- zoner.
+- boss.
+
+Implementa una arquitectura de decisión basada en estados.
+
+Estados:
+
+- APPROACH.
+- RETREAT.
+- NEUTRAL.
+- ATTACK.
+- DEFEND.
+- PUNISH.
+- JUMP.
+- SPECIAL.
+- RECOVER.
+
+Incorpora:
+
+- Reaction delay.
+- Decision interval.
+- Distance evaluation.
+- Health evaluation.
+- Meter evaluation.
+- Opponent recovery evaluation.
+- Risk/reward evaluation.
+- Difficulty modifiers.
+
+No permitas input reading omnisciente.
+
+La IA no puede reaccionar a una acción antes de que el tiempo de reacción configurado lo permita.
+
+Dificultades:
+
+EASY:
+- Menor presión.
+- Reacciones lentas.
+- Errores razonables.
+
+NORMAL:
+- Juego equilibrado.
+- Uso moderado de especiales.
+
+HARD:
+- Mayor presión.
+- Mejor gestión de distancia.
+- Castigos consistentes.
+
+EXPERT:
+- Combos optimizados.
+- Mejor defensa.
+- Gestión avanzada de recursos.
+- Castigos precisos dentro de límites humanos.
+
+El jefe debe utilizar una estrategia diferenciada, no simplemente estadísticas superiores.
+
+---
+
+# 15. SPRITESHEET PIPELINE Y PIXEL ART
+
+Preserva todos los recursos gráficos originales.
+
+Examina:
+
+- Image dimensions.
+- Frame dimensions.
+- Rows.
+- Columns.
+- Alpha channel.
+- Transparent margins.
+- Anchor points.
+- Animation frame order.
+- Character scale.
+- Pixel density.
+
+Normaliza los spritesheets sin deformar sus proporciones.
+
+Evita:
+
+- Texture bleeding.
+- Incorrect frame cropping.
+- Transparent fringe.
+- Background artifacts.
+- Sprite jitter.
+- Foot sliding.
+- Inconsistent pivot points.
+- Unintentional scaling.
+- Aliasing.
+
+Implementa caché de imágenes y sprites procesados.
+
+Evita reprocesar imágenes en cada frame.
+
+Crea un catálogo de animaciones por personaje.
+
+Mantén una nomenclatura consistente.
+
+Si faltan frames, registra la ausencia y prepara su incorporación. No inventes archivos gráficos que no existen.
+
+---
+
+# 16. VISUAL EFFECTS Y GAME FEEL
+
+Moderniza el feedback audiovisual.
+
+Implementa:
+
+- Hit sparks.
+- Heavy hit effects.
+- Block sparks.
+- Counter hit effects.
+- Dust particles.
+- Landing effects.
+- Projectile trails.
+- Super flash.
+- Screen shake.
+- Hitstop.
+- Impact rings.
+
+Cada efecto debe estar asociado a un evento de combate.
+
+No ejecutes efectos directamente desde las reglas matemáticas del motor.
+
+Utiliza un sistema de eventos.
+
+Controla:
+
+- Particle lifetime.
+- Maximum particle count.
+- Spawn rate.
+- Update cost.
+- Alpha decay.
+- Velocity.
+- Gravity.
+- Screen bounds.
+
+Implementa límites para impedir explosiones de partículas.
+
+Los efectos deben respetar el estilo pixel art.
+
+---
+
+# 17. STAGE SYSTEM
+
+Preserva los seis escenarios originales.
+
+Evalúa:
+
+- Parallax layers.
+- Background animation.
+- Foreground elements.
+- Lighting.
+- Environmental effects.
+- Camera composition.
+- Character visibility.
+- Collision boundaries.
+
+Mantén separadas las coordenadas del escenario y las del combate.
+
+No permitas que los elementos ambientales alteren involuntariamente las hitboxes.
+
+No cambies los límites del escenario sin validar el movimiento y la separación de luchadores.
+
+---
+
+# 18. TRAINING MODE
+
+Incorpora un nuevo modo sin alterar los modos arcade y versus.
+
+Debe utilizar el mismo motor de combate.
+
+Funciones:
+
+- Dummy stationary.
+- Dummy blocking.
+- Dummy attacking.
+- Reset position.
+- Reset health.
+- Reset meter.
+- Infinite meter.
+- Infinite health.
+- Hitbox display.
+- Hurtbox display.
+- Frame data display.
+- Input history.
+- Combo counter.
+- Damage display.
+- Recording and playback de secuencias, si la arquitectura lo permite.
+
+La configuración de entrenamiento no debe modificar permanentemente el balance normal.
+
+Debe existir una configuración aislada para training mode.
+
+---
+
+# 19. HUD Y UI/UX
+
+Moderniza la interfaz conservando la estética arcade original.
+
+Implementa o perfecciona:
+
+- Health bars.
+- Super meter.
+- Ultra indicator.
+- Combo counter.
+- Timer.
+- Round indicator.
+- Character names.
+- Player identification.
+- Pause menu.
+- Training overlays.
+- Damage feedback.
+
+Requisitos:
+
+- Jerarquía visual.
+- Contraste.
+- Lectura rápida.
+- Escalado responsive.
+- Consistencia tipográfica.
+- Estados hover/focus.
+- Navegación por teclado.
+- Navegación por mando.
+- Accesibilidad.
+
+No mezcles lógica de combate con lógica de presentación.
+
+El HUD debe recibir información del estado del juego, no modificar directamente sus reglas.
+
+---
+
+# 20. AUDIO ENGINE
+
+Preserva las pistas y recursos de sonido.
+
+Establece:
+
+- Master volume.
+- Music volume.
+- SFX volume.
+- Voice volume, si existe.
+- Audio event routing.
+- Playback priority.
+- Voice concurrency.
+- SFX throttling.
+- Audio cleanup.
+
+No reproduzcas el mismo sonido repetidamente en cada frame de una colisión persistente.
+
+Cada evento de impacto debe producir una respuesta controlada.
+
+Gestiona correctamente AudioContext y sus estados de suspensión y reanudación.
+
+No asumas que el navegador permite reproducir audio antes de una interacción del usuario.
+
+---
+
+# 21. RESOURCE MANAGEMENT
+
+Moderniza `src/game/spriteSheet.ts`.
+
+Implementa:
+
+- Lazy loading.
+- Asset cache.
+- Shared image references.
+- Loading state.
+- Failed asset handling.
+- Preload selected fighters.
+- Stage asset loading.
+- Resource reuse.
+- Error reporting.
+
+Evita:
+
+- Cargas duplicadas.
+- Image decoding repetido.
+- Creación masiva de canvas.
+- Procesamiento de sprites por frame.
+- Referencias innecesarias.
+- Retención indefinida de recursos temporales.
+
+No liberes recursos compartidos mientras otro componente los esté utilizando.
+
+---
+
+# 22. CODE QUALITY Y TYPESCRIPT
+
+Aplica:
+
+- Strict typing.
+- Explicit interfaces.
+- Discriminated unions.
+- Exhaustive switch checks.
+- Pure functions.
+- Dependency isolation.
+- Immutable configuration.
+- Typed event definitions.
+- Consistent naming.
+- Single responsibility principle.
+- Separation of concerns.
+
+Evita:
+
+- any injustificados.
+- Type assertions inseguras.
+- Magic numbers.
+- Duplicated calculations.
+- Hidden global state.
+- Circular dependencies.
+- Excessive React re-renders.
+- Unnecessary component coupling.
+
+Centraliza constantes de gameplay.
+
+Ejemplo:
+
+```ts
+export const GAME_CONFIG = {
+  simulationHz: 60,
+  logicalWidth: 1280,
+  logicalHeight: 720,
+  maxFrameDelta: 0.05,
+  maxParticles: 500,
+  defaultRoundTime: 99,
+} as const;
+```
+
+No dupliques valores de configuración en diferentes módulos.
+
+---
+
+# 23. PERFORMANCE ENGINEERING
+
+No optimices por intuición.
+
+Primero mide.
+
+Incorpora un sistema de diagnóstico que permita visualizar:
+
+- FPS.
+- Frame time.
+- Simulation time.
+- Render time.
+- Update count.
+- Draw calls aproximadas.
+- Particle count.
+- Active projectiles.
+- Loaded spritesheets.
+- Memory, cuando el navegador exponga métricas compatibles.
+
+Utiliza herramientas de profiling del navegador cuando estén disponibles.
+
+Busca:
+
+- Long tasks.
+- Garbage collection spikes.
+- Excessive allocations.
+- Layout thrashing.
+- Canvas overdraw.
+- Unnecessary image scaling.
+- Repeated calculations.
+- Excessive event dispatch.
+
+Objetivos de referencia:
+
+- Simulation tick: 16,67 ms.
+- Render loop: adaptable al monitor.
+- Sin crecimiento sostenido de memoria.
+- Sin bloqueos prolongados.
+- Sin acumulación ilimitada de partículas.
+- Sin pérdida de inputs.
+- Sin divergencia entre renderizado y simulación.
+
+Estos valores son objetivos de diseño, no resultados medidos.
+
+---
+
+# 24. PRUEBAS UNITARIAS E INVARIANTES
+
+Crea pruebas para todas las funciones puras del motor.
+
+Ejemplos:
+
+```ts
+import test from "node:test";
+import assert from "node:assert/strict";
+
+test("AABB detects overlapping rectangles", () => {
+  const a = {
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+  };
+
+  const b = {
+    x: 50,
+    y: 50,
+    width: 100,
+    height: 100,
+  };
+
+  assert.equal(intersectsAABB(a, b), true);
+});
+
+test("AABB rejects non-overlapping rectangles", () => {
+  const a = {
+    x: 0,
+    y: 0,
+    width: 20,
+    height: 20,
+  };
+
+  const b = {
+    x: 50,
+    y: 50,
+    width: 20,
+    height: 20,
+  };
+
+  assert.equal(intersectsAABB(a, b), false);
+});
+
+test("Damage calculation applies power multiplier once", () => {
+  const damage = calculateFinalDamage({
+    baseDamage: 92,
+    powerMultiplier: 1.12,
+    comboMultiplier: 1,
+    counterMultiplier: 1,
+    defenseMultiplier: 1,
+  });
+
+  assert.equal(damage, 103);
+});
+
+test("Combo scaling never falls below configured minimum", () => {
+  assert.equal(
+    getComboScaling(100, 0.25),
+    0.25
+  );
+});
+```
+
+Adapta imports, exports y rutas a la implementación real.
+
+Añade pruebas para:
+
+- Fighter state transitions.
+- Attack frame transitions.
+- Projectile collision.
+- Block resolution.
+- Clean hit resolution.
+- Combo cancellation.
+- Multihit reset.
+- Meter consumption.
+- KO conditions.
+- Round reset.
+- Gamepad disconnection.
+- Input conflict detection.
+
+## Invariantes obligatorios
+
+1. HP siempre debe estar entre 0 y maxHp.
+2. Super meter debe estar dentro de su rango permitido.
+3. Timer nunca debe ser negativo.
+4. KO no puede ejecutar ataques.
+5. Un mismo contacto no puede procesarse dos veces accidentalmente.
+6. El daño debe ser finito y no negativo.
+7. El número de partículas debe respetar su límite.
+8. Los proyectiles deben tener propietario válido.
+9. Los estados deben respetar transiciones permitidas.
+10. La pausa debe detener la simulación.
+11. Los recursos originales no deben modificarse destructivamente.
+12. El reinicio debe restablecer correctamente el estado de la ronda.
+
+---
+
+# 25. REGRESSION TESTING
+
+Cada cambio debe comprobar que los sistemas anteriores continúan funcionando.
+
+Matriz mínima:
+
+- Main menu.
+- Character selection.
+- Stage selection.
+- Arcade.
+- Versus local.
+- All fighters.
+- All stages.
+- Normal attacks.
+- Special attacks.
+- Ultra.
+- Projectile.
+- Block.
+- Counter hit.
+- Combos.
+- Finish Him.
+- KO.
+- Victory.
+- Defeat.
+- Pause.
+- Restart.
+- Audio.
+- Keyboard.
+- Gamepad.
+- Two-player controls.
+- Training mode.
+
+No consideres terminada una modificación únicamente porque compila.
+
+---
+
+# 26. CRITERIOS DE ACEPTACIÓN DE URBANOFIGHT CL 2.0
+
+La versión solo podrá considerarse candidata a publicación cuando:
+
+A. PROGRAMACIÓN
+- TypeScript compila.
+- No existen errores críticos.
+- No existen dependencias circulares nuevas.
+- Las interfaces están correctamente tipadas.
+
+B. COMBATE
+- Los ataques tienen timing consistente.
+- Los impactos se procesan correctamente.
+- Los bloqueos funcionan.
+- Los combos respetan sus reglas.
+- El daño es matemáticamente consistente.
+- No existen infinitos no deseados.
+
+C. CONTROLES
+- P1 funciona.
+- P2 funciona.
+- Los mandos están correctamente asociados.
+- No existen conflictos de entradas.
+
+D. GRÁFICOS
+- Los spritesheets se interpretan correctamente.
+- Las animaciones no se deforman.
+- No existen errores graves de transparencia.
+- La identidad visual se conserva.
+
+E. AUDIO
+- Los sonidos corresponden a sus eventos.
+- La música funciona.
+- Los controles de volumen funcionan.
+
+F. RENDIMIENTO
+- La simulación mantiene su frecuencia objetivo cuando el hardware lo permite.
+- No existen bloqueos sistemáticos.
+- No hay crecimiento descontrolado de recursos.
+
+G. PRUEBAS
+- Las pruebas automatizadas se ejecutan.
+- Las regresiones se revisan.
+- La compilación final se verifica.
+
+---
+
+# 27. PLAN DE EJECUCIÓN Y ORDEN DE TRABAJO
+
+Ejecuta las tareas en este orden:
+
+## SPRINT 0 — BASELINE
+- Inventario.
+- Inspección.
+- Mapa de dependencias.
+- Estado de compilación.
+- Estado de pruebas.
+- Identificación de riesgos.
+- Copia de seguridad lógica o control de cambios.
+
+## SPRINT 1 — BUG FIXING
+- H-01 teclado.
+- H-02 daño.
+- H-03 contactos.
+- H-04 gamepad.
+- H-05 testing.
+
+## SPRINT 2 — COMBAT ENGINE
+- Frame data.
+- Hitboxes.
+- Hurtboxes.
+- Cancel windows.
+- Hitstun.
+- Blockstun.
+- Combo scaling.
+- Multihit.
+- Damage pipeline.
+
+## SPRINT 3 — GAME FEEL
+- Hitstop.
+- Knockback.
+- Impact effects.
+- Counter feedback.
+- Screen shake.
+- Audio synchronization.
+
+## SPRINT 4 — CHARACTER BALANCE
+- Fighter profiles.
+- AI policies.
+- Match simulations.
+- Damage analysis.
+- Mobility analysis.
+
+## SPRINT 5 — VISUAL ENGINE
+- Spritesheets.
+- Animation timing.
+- Anchor points.
+- Transparency.
+- Asset caching.
+- Stage effects.
+
+## SPRINT 6 — GAME FEATURES
+- Training mode.
+- Difficulty selection.
+- Advanced settings.
+- Combat diagnostics.
+- Statistics.
+
+## SPRINT 7 — OPTIMIZATION
+- Fixed timestep.
+- Profiling.
+- Resource loading.
+- Memory.
+- Rendering.
+- Input latency.
+
+## SPRINT 8 — RELEASE CANDIDATE
+- Full testing.
+- Build.
+- Regression.
+- Documentation.
+- Version report.
+
+No implementes simultáneamente todas las fases sin validar las dependencias.
+
+Completa cada sprint antes de introducir cambios que dependan de él.
+
+---
+
+# 28. CONTROL DE CAMBIOS Y ENTREGABLES
+
+Por cada modificación registra:
+
+- Change ID.
+- Archivo afectado.
+- Función afectada.
+- Problema original.
+- Solución implementada.
+- Dependencias.
+- Riesgo.
+- Prueba asociada.
+- Resultado.
+
+Formato:
+
+```text
+CHANGE ID: UF20-H01
+MODULE: FightArena
+ISSUE: Keyboard collision
+CHANGE: Input mapping refactor
+STATUS: Implemented / Pending / Blocked
+TEST: Keyboard regression
+RESULT: Pass / Fail / Not executed
+```
+
+No marques como implementado lo que solamente fue propuesto.
+
+Al terminar cada sprint, entrega:
+
+1. Resumen.
+2. Archivos modificados.
+3. Archivos creados.
+4. Código implementado.
+5. Errores corregidos.
+6. Nuevas funcionalidades.
+7. Pruebas ejecutadas.
+8. Resultados.
+9. Riesgos pendientes.
+10. Próximo sprint.
+
+Mantén la posibilidad de revertir cada conjunto de cambios.
+
+---
+
+# 29. RESTRICCIONES ESPECÍFICAS DE GOOGLE AI STUDIO
+
+El proyecto fue desarrollado originalmente mediante Google AI Studio.
+
+Por tanto:
+
+- Trabaja con el entorno y herramientas realmente disponibles.
+- No asumas acceso a terminal si no existe.
+- No afirmes haber ejecutado npm si no tienes ejecución de comandos.
+- No inventes resultados de compilación.
+- No supongas que todos los archivos del ZIP están disponibles.
+- No sustituyas código fuente por explicaciones.
+- No entregues cambios parciales como si fueran un proyecto terminado.
+- Si necesitas modificar un archivo, trabaja sobre su contenido real.
+- Si necesitas modificar varios archivos relacionados, actualiza todos los contratos dependientes.
+- Si una operación excede los límites de contexto, divide el trabajo por módulos y conserva un registro de estado.
+- No repitas modificaciones ya implementadas.
+- Antes de continuar una fase, verifica el estado de los archivos actuales.
+
+Si no puedes escribir directamente en el proyecto, entrega los archivos completos modificados y sus rutas exactas, identificándolos como código generado pendiente de integración.
+
+---
+
+# 30. DIRECTIVA FINAL DE EJECUCIÓN
+
+INICIA LA MODERNIZACIÓN DE URBANOFIGHT CL.
+
+Primero examina el código real y determina el baseline.
+
+Después implementa inmediatamente el SPRINT 0 y el SPRINT 1.
+
+No te detengas a describir lo que podrías hacer.
+
+Realiza las modificaciones concretas.
+
+Prioriza:
+
+1. Corrección de controles.
+2. Corrección del cálculo de daño.
+3. Corrección de resolución de contactos.
+4. Corrección de vibración por jugador.
+5. Integración de pruebas automatizadas.
+
+Una vez verificadas estas correcciones, continúa con la modernización del motor de combate.
+
+No modifiques recursos originales innecesariamente.
+
+No alteres la identidad de los personajes.
+
+No cambies el estilo visual.
+
+No destruyas las funcionalidades arcade existentes.
+
+No introduzcas errores para añadir características.
+
+No reduzcas la calidad técnica por velocidad de implementación.
+
+Si un requisito no puede cumplirse, documenta la limitación exacta.
+
+El objetivo final es construir una versión 2.0 que represente una evolución real y demostrable del videojuego.
+
+**URBANOFIGHT CL 2.0 — ENGINEERING OBJECTIVE**
+
+Desarrollar un fighting game arcade 2D con arquitectura mantenible, simulación determinista, frame data configurable, colisiones precisas, cancelaciones controladas, balance medible, inteligencia artificial coherente, animaciones consistentes, presentación audiovisual de calidad y compatibilidad con su infraestructura original.
+
+**NO RECONSTRUIR. NO IMPROVISAR. NO SIMULAR VALIDACIONES. ANALIZAR, IMPLEMENTAR, MEDIR Y VERIFICAR.**
